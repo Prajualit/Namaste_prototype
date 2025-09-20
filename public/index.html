@@ -14,56 +14,96 @@
             <p>Traditional Medicine to International Classification Dual-Coding System</p>
         </header>
 
-        <div class="demo-section">
-            <div class="search-container">
-                <h2>Step 1: Search Traditional Medicine Concepts</h2>
-                <div class="search-input-group">
-                    <input type="text" id="searchInput" placeholder="Enter condition (e.g., fever, anxiety, diabetes)" />
-                    <select id="systemSelect">
-                        <option value="all">All Systems</option>
-                        <option value="ayurveda">Ayurveda</option>
-                        <option value="siddha">Siddha</option>
-                        <option value="unani">Unani</option>
-                        <option value="icd11">ICD-11</option>
-                    </select>
-                    <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+        <!-- Authentication Section -->
+        <div id="loginSection" class="auth-section" style="display: none;">
+            <div class="auth-container">
+                <h2><i class="fas fa-shield-alt"></i> ABHA Authentication</h2>
+                <p>Please authenticate using your ABHA (Ayushman Bharat Health Account) token to access the demo.</p>
+                
+                <form id="loginForm" class="auth-form">
+                    <div class="input-group">
+                        <label for="abhaToken">ABHA JWT Token:</label>
+                        <textarea id="abhaToken" rows="4" placeholder="Paste your ABHA JWT token here..." required></textarea>
+                        <small>Don't have an ABHA token? <a href="#" onclick="toggleDemoMode()">Use Demo Mode</a></small>
+                    </div>
+                    <button type="submit" class="auth-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login with ABHA
+                    </button>
+                </form>
+                
+                <div class="demo-mode-info">
+                    <h3>Demo Mode</h3>
+                    <p>For testing purposes, you can use demo mode with simulated ABHA authentication.</p>
+                    <button onclick="toggleDemoMode()" class="demo-btn">
+                        <i class="fas fa-play-circle"></i> Enter Demo Mode
+                    </button>
                 </div>
-                <div id="searchResults" class="results-container"></div>
-            </div>
-
-            <div class="translation-container">
-                <h2>Step 2: Selected Concepts & Auto-Translation</h2>
-                <div id="selectedConcepts" class="selected-concepts"></div>
-            </div>
-
-            <div class="bundle-container">
-                <h2>Step 3: Generate FHIR Bundle</h2>
-                <div class="patient-input">
-                    <label for="patientId">Patient ID:</label>
-                    <input type="text" id="patientId" value="patient-demo-001" />
-                    <button id="generateBundle"><i class="fas fa-file-medical"></i> Generate Dual-Coded Bundle</button>
-                </div>
-                <div id="fhirBundle" class="fhir-display"></div>
             </div>
         </div>
 
-        <div class="demo-scenarios">
-            <h2>Demo Scenarios</h2>
-            <div class="scenario-buttons">
-                <button class="scenario-btn" data-scenario="anxiety">Anxiety Disorder</button>
-                <button class="scenario-btn" data-scenario="diabetes">Diabetes Management</button>
-                <button class="scenario-btn" data-scenario="fatigue">Chronic Fatigue</button>
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="dashboard" style="display: none;">
+            <!-- User Info Panel -->
+            <div class="user-panel">
+                <div id="userInfo" class="user-info"></div>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
-        </div>
 
-        <div class="api-info">
-            <h3>API Endpoints</h3>
-            <ul>
-                <li><code>GET /api/terminology/lookup</code> - Search concepts</li>
-                <li><code>POST /api/translation/$translate</code> - Translate concepts</li>
-                <li><code>GET /fhir/CodeSystem/namaste-ayurveda</code> - FHIR CodeSystem</li>
-                <li><code>POST /fhir/Bundle</code> - Create dual-coded bundle</li>
-            </ul>
+            <div class="demo-section">
+                <div class="search-container">
+                    <h2>Step 1: Search Traditional Medicine Concepts</h2>
+                    <div class="search-input-group">
+                        <input type="text" id="searchInput" placeholder="Enter condition (e.g., fever, anxiety, diabetes)" />
+                        <select id="systemSelect">
+                            <option value="all">All Systems</option>
+                            <option value="ayurveda">Ayurveda</option>
+                            <option value="siddha">Siddha</option>
+                            <option value="unani">Unani</option>
+                            <option value="icd11">ICD-11</option>
+                        </select>
+                        <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+                    </div>
+                    <div id="searchResults" class="results-container"></div>
+                </div>
+
+                <div class="translation-container">
+                    <h2>Step 2: Selected Concepts & Auto-Translation</h2>
+                    <div id="selectedConcepts" class="selected-concepts"></div>
+                </div>
+
+                <div class="bundle-container">
+                    <h2>Step 3: Generate FHIR Bundle</h2>
+                    <div class="patient-input">
+                        <label for="patientId">Patient ID:</label>
+                        <input type="text" id="patientId" value="patient-demo-001" />
+                        <button id="generateBundle"><i class="fas fa-file-medical"></i> Generate Dual-Coded Bundle</button>
+                    </div>
+                    <div id="fhirBundle" class="fhir-display"></div>
+                </div>
+            </div>
+
+            <div class="demo-scenarios">
+                <h2>Demo Scenarios</h2>
+                <div class="scenario-buttons">
+                    <button class="scenario-btn" data-scenario="anxiety">Anxiety Disorder</button>
+                    <button class="scenario-btn" data-scenario="diabetes">Diabetes Management</button>
+                    <button class="scenario-btn" data-scenario="fatigue">Chronic Fatigue</button>
+                </div>
+            </div>
+
+            <div class="api-info">
+                <h3>API Endpoints</h3>
+                <ul>
+                    <li><code>POST /api/users/auth/login</code> - ABHA authentication</li>
+                    <li><code>GET /api/users/profile</code> - User profile</li>
+                    <li><code>GET /api/terminology/lookup</code> - Search concepts</li>
+                    <li><code>POST /api/translation/$translate</code> - Translate concepts</li>
+                    <li><code>GET /fhir/CodeSystem/namaste-ayurveda</code> - FHIR CodeSystem</li>
+                    <li><code>POST /fhir/Bundle</code> - Create dual-coded bundle</li>
+                </ul>
+            </div>
         </div>
     </div>
 

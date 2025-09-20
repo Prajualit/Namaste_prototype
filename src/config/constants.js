@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   NAMASTE_SYSTEMS: {
     AYURVEDA: 'http://terminology.gov.in/namaste/ayurveda',
     SIDDHA: 'http://terminology.gov.in/namaste/siddha',

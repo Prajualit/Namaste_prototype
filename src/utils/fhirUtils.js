@@ -1,5 +1,5 @@
-const { v4: uuidv4 } = require('uuid');
-const constants = require('../config/constants');
+import { v4 as uuidv4 } from 'uuid';
+import constants from '../config/constants.js';
 
 // FHIR resource builders
 const buildCodeSystem = (concepts, system, name, description) => {
@@ -132,7 +132,7 @@ const buildConditionResource = (patientId, namasteCode, icd11Code, clinicalStatu
   };
 };
 
-module.exports = {
+export {
   buildCodeSystem,
   buildConceptMap,
   buildConditionResource

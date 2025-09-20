@@ -1,7 +1,7 @@
-const searchService = require('../services/searchService');
-const { formatSearchResults, createResponse } = require('../utils/response');
-const { searchValidation, validateRequest } = require('../middleware/validation');
-const logger = require('../utils/logger');
+import searchService from '../services/searchService.js';
+import { formatSearchResults, createResponse } from '../utils/response.js';
+import { searchValidation, validateRequest } from '../middleware/validation.js';
+import logger from '../utils/logger.js';
 
 class TerminologyController {
   // Search concepts across all systems
@@ -188,4 +188,4 @@ class TerminologyController {
   }
 }
 
-module.exports = new TerminologyController();
+export default new TerminologyController();

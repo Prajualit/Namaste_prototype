@@ -1,15 +1,51 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const path = require('path');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
-const routes = require('./routes');
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
-const logger = require('./utils/logger');
+import routes from './routes/index.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import logger from './utils/logger.js';
+import userService from './services/userService.js';
+import healthMonitor from './services/healthMonitorService.js';
+
+// Load environment variables
+dotenv.config();
+
+// ES6 module dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Create Express application
 const app = express();
+
+// Initialize user service
+async function initializeServices() {
+  try {
+    await userService.initialize();
+    logger.info('User service initialized successfully');
+    
+    // Initialize health monitoring (non-blocking)
+    if (healthMonitor.startMonitoring) {
+      healthMonitor.startMonitoring();
+      logger.info('Health monitoring started');
+    }
+    
+    logger.info('All services initialized successfully');
+  } catch (error) {
+    logger.error('Service initialization failed:', error);
+    // Don't exit the process, just log the error and continue
+    logger.warn('Continuing without full service initialization');
+  }
+}
+
+// Initialize services on startup (non-blocking)
+initializeServices().catch((error) => {
+  logger.error('Service initialization error:', error);
+  logger.warn('Server starting without full service initialization');
+});
 
 // Security middleware
 app.use(helmet({
@@ -56,7 +92,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api', routes);
 
 // FHIR endpoints at root level (FHIR standard)
-app.use('/fhir', require('./routes/fhir'));
+import fhirRoutes from './routes/fhir.js';
+app.use('/fhir', fhirRoutes);
 
 // Serve demo UI at root
 app.get('/', (req, res) => {
@@ -69,4 +106,4 @@ app.use(notFoundHandler);
 // Global error handler
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

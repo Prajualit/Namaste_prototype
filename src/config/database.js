@@ -1,5 +1,9 @@
-const { Sequelize } = require('sequelize');
-const path = require('path');
+import { Sequelize } from 'sequelize';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // SQLite configuration for demo
 const sequelize = new Sequelize({
@@ -14,4 +18,5 @@ const sequelize = new Sequelize({
   },
 });
 
-module.exports = sequelize;
+export { sequelize };
+export default sequelize;

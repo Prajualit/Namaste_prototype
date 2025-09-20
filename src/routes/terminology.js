@@ -1,6 +1,6 @@
-const express = require('express');
-const terminologyController = require('../controllers/terminologyController');
-const { searchValidation, validateRequest } = require('../middleware/validation');
+import express from 'express';
+import terminologyController from '../controllers/terminologyController.js';
+import { searchValidation, validateRequest } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -24,4 +24,4 @@ router.get('/systems',
   terminologyController.getSystems
 );
 
-module.exports = router;
+export default router;

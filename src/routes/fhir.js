@@ -1,7 +1,7 @@
-const express = require('express');
-const fhirController = require('../controllers/fhirController');
-const { fhirResourceValidation, validateRequest } = require('../middleware/validation');
-const { mockAuth } = require('../middleware/auth');
+import express from 'express';
+import fhirController from '../controllers/fhirController.js';
+import { fhirResourceValidation, validateRequest } from '../middleware/validation.js';
+import { abhaAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -14,8 +14,8 @@ router.get('/CodeSystem/namaste-:system', fhirController.getCodeSystem);
 // ConceptMap endpoints
 router.get('/ConceptMap/namaste-icd11', fhirController.getConceptMap);
 
-// Protected endpoints
-router.use(mockAuth);
+// Protected endpoints (for creating resources)
+router.use('/Bundle', abhaAuth);
 
 // Create dual-coded bundle
 // POST /fhir/Bundle
@@ -31,4 +31,4 @@ router.post('/$validate',
   fhirController.validateResource
 );
 
-module.exports = router;
+export default router;

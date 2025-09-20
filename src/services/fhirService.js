@@ -1,9 +1,9 @@
-const { v4: uuidv4 } = require('uuid');
-const constants = require('../config/constants');
-const fhirConfig = require('../config/fhir');
-const searchService = require('./searchService');
-const mappingService = require('./mappingService');
-const { buildCodeSystem, buildConceptMap } = require('../utils/fhirUtils');
+import { v4 as uuidv4 } from 'uuid';
+import constants from '../config/constants.js';
+import fhirConfig from '../config/fhir.js';
+import searchService from './searchService.js';
+import mappingService from './mappingService.js';
+import { buildCodeSystem, buildConceptMap } from '../utils/fhirUtils.js';
 
 class FhirService {
   // Generate NAMASTE CodeSystem resource
@@ -176,4 +176,4 @@ class FhirService {
   }
 }
 
-module.exports = new FhirService();
+export default new FhirService();

@@ -1,4 +1,4 @@
-const { body, param, query, validationResult } = require('express-validator');
+import { body, param, query, validationResult } from 'express-validator';
 
 // Request validation middleware
 const validateRequest = (req, res, next) => {
@@ -49,7 +49,7 @@ const fhirResourceValidation = [
     .withMessage('Invalid FHIR ID format')
 ];
 
-module.exports = {
+export {
   validateRequest,
   searchValidation,
   translationValidation,

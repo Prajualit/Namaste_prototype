@@ -1,5 +1,7 @@
 // Global state
 let selectedConcepts = [];
+let currentUser = null;
+let authToken = null;
 
 // DOM elements  
 const searchInput = document.getElementById('searchInput');
@@ -11,20 +13,202 @@ const generateBundleBtn = document.getElementById('generateBundle');
 const patientIdInput = document.getElementById('patientId');
 const fhirBundleContainer = document.getElementById('fhirBundle');
 
-// Event listeners
-searchBtn.addEventListener('click', performSearch);
-generateBundleBtn.addEventListener('click', generateBundle);
+// Authentication elements
+const loginSection = document.getElementById('loginSection');
+const dashboardSection = document.getElementById('dashboardSection'); 
+const loginForm = document.getElementById('loginForm');
+const abhaTokenInput = document.getElementById('abhaToken');
+const userInfoDiv = document.getElementById('userInfo');
+const logoutBtn = document.getElementById('logoutBtn');
 
-// Demo scenario buttons
-document.querySelectorAll('.scenario-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const scenario = e.target.dataset.scenario;
-        runDemoScenario(scenario);
+// Initialize app
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// Authentication functions
+async function initializeApp() {
+    // Check if user is already logged in
+    const savedToken = localStorage.getItem('abhaToken');
+    const savedUser = localStorage.getItem('userData');
+    
+    if (savedToken && savedUser) {
+        try {
+            // Verify token is still valid
+            const response = await fetch('/api/users/token/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: savedToken })
+            });
+            
+            const data = await response.json();
+            if (data.success && data.data.valid) {
+                authToken = savedToken;
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+                return;
+            }
+        } catch (error) {
+            console.error('Token verification failed:', error);
+        }
+        
+        // Clear invalid token
+        localStorage.removeItem('abhaToken');
+        localStorage.removeItem('userData');
+    }
+    
+    showLogin();
+}
+
+function showLogin() {
+    if (loginSection) loginSection.style.display = 'block';
+    if (dashboardSection) dashboardSection.style.display = 'none';
+}
+
+function showDashboard() {
+    if (loginSection) loginSection.style.display = 'none';
+    if (dashboardSection) dashboardSection.style.display = 'block';
+    
+    if (currentUser && userInfoDiv) {
+        userInfoDiv.innerHTML = `
+            <div class="user-card">
+                <h3>Welcome, ${currentUser.name}</h3>
+                <p><strong>ABHA Number:</strong> ${currentUser.abhaNumber}</p>
+                <p><strong>Email:</strong> ${currentUser.email || 'Not provided'}</p>
+                <p><strong>Mobile:</strong> ${currentUser.mobile || 'Not provided'}</p>
+                <p><strong>Health ID:</strong> ${currentUser.healthId || 'Not linked'}</p>
+            </div>
+        `;
+    }
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    
+    const token = abhaTokenInput ? abhaTokenInput.value.trim() : '';
+    
+    if (!token) {
+        showError('Please enter your ABHA token');
+        return;
+    }
+    
+    try {
+        const loginBtn = event.target.querySelector('button[type="submit"]');
+        if (loginBtn) {
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            loginBtn.disabled = true;
+        }
+        
+        const response = await fetch('/api/users/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            authToken = token;
+            currentUser = data.data.user;
+            
+            // Save to localStorage
+            localStorage.setItem('abhaToken', token);
+            localStorage.setItem('userData', JSON.stringify(currentUser));
+            
+            showSuccess('Login successful!');
+            showDashboard();
+        } else {
+            showError(data.message || 'Authentication failed');
+        }
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('Login failed. Please check your token and try again.');
+    } finally {
+        const loginBtn = event.target.querySelector('button[type="submit"]');
+        if (loginBtn) {
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            loginBtn.disabled = false;
+        }
+    }
+}
+
+function handleLogout() {
+    authToken = null;
+    currentUser = null;
+    selectedConcepts = [];
+    
+    localStorage.removeItem('abhaToken');
+    localStorage.removeItem('userData');
+    
+    if (abhaTokenInput) abhaTokenInput.value = '';
+    updateSelectedConcepts();
+    
+    showSuccess('Logged out successfully');
+    showLogin();
+}
+
+// Demo mode toggle
+function toggleDemoMode() {
+    if (currentUser) {
+        showError('Already authenticated with ABHA. Logout to use demo mode.');
+        return;
+    }
+    
+    // Set demo token and user
+    authToken = 'demo-token-12345';
+    currentUser = {
+        abhaId: 'demo-user',
+        abhaNumber: '11-1111-1111-1111',
+        name: 'Demo User',
+        email: 'demo@example.com',
+        mobile: '+91-9999999999',
+        healthId: 'demo@sbx'
+    };
+    
+    showSuccess('Demo mode activated');
+    showDashboard();
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize app
+    initializeApp();
+    
+    // Search functionality
+    if (searchBtn) searchBtn.addEventListener('click', performSearch);
+    if (generateBundleBtn) generateBundleBtn.addEventListener('click', generateBundle);
+    
+    // Authentication
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+    
+    // Demo scenario buttons
+    document.querySelectorAll('.scenario-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const scenario = e.target.dataset.scenario;
+            runDemoScenario(scenario);
+        });
     });
 });
 
+// Demo scenario buttons (moved from top level)
+// document.querySelectorAll('.scenario-btn').forEach(btn => {
+//     btn.addEventListener('click', (e) => {
+//         const scenario = e.target.dataset.scenario;
+//         runDemoScenario(scenario);
+//     });
+// });
+
 // Search functionality
 async function performSearch() {
+    if (!authToken) {
+        showError('Please login first to search concepts');
+        return;
+    }
+    
     const query = searchInput.value.trim();
     const system = systemSelect.value;
     
@@ -37,16 +221,21 @@ async function performSearch() {
         searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
         searchBtn.disabled = true;
         
-        // Use demo token for authentication
         const response = await fetch(`/api/terminology/lookup?q=${encodeURIComponent(query)}&system=${system}`, {
             headers: {
-                'Authorization': 'Bearer demo-token-12345'
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
             }
         });
         
         if (!response.ok) {
+            if (response.status === 401) {
+                showError('Authentication expired. Please login again.');
+                handleLogout();
+                return;
+            }
             const errorData = await response.json();
-            throw new Error(errorData.issue?.[0]?.details?.text || 'Search failed');
+            throw new Error(errorData.issue?.[0]?.details?.text || errorData.message || 'Search failed');
         }
         
         const data = await response.json();
@@ -54,8 +243,10 @@ async function performSearch() {
         
     } catch (error) {
         showError('Search error: ' + error.message);
-        // Show some demo data if API fails
-        showDemoResults(query);
+        // Show some demo data if API fails (only in demo mode)
+        if (authToken === 'demo-token-12345') {
+            showDemoResults(query);
+        }
     } finally {
         searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
         searchBtn.disabled = false;
