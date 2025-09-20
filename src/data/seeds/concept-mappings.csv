@@ -1,0 +1,13 @@
+namasteCode,icd11Code,relationship,confidenceScore,comment
+AY001,MD90.0,related-to,0.75,Vata imbalance often correlates with anxiety
+AY002,MG30.0,source-is-narrower-than-target,0.68,Pitta excess can manifest as hypertension
+AY003,ME84.1,equivalent,0.82,Kapha stagnation similar to chronic fatigue
+AY004,MF25.2,related-to,0.73,Agni Mandya relates to digestive issues
+AY005,MF40.1,source-is-broader-than-target,0.67,Ama can cause various digestive problems
+SI001,MD90.0,related-to,0.70,Vatha disorders often include anxiety symptoms
+SI002,MG30.0,related-to,0.72,Pitham excess can lead to cardiovascular issues
+SI003,MF50.3,equivalent,0.78,Kabam stagnation similar to IBS
+UN001,MG30.0,source-is-broader-than-target,0.65,Sanguine temperament encompasses various cardiovascular issues
+UN002,ME84.1,related-to,0.69,Melancholic constitution often presents with fatigue
+UN003,MG24.0,related-to,0.71,Phlegmatic imbalance affects sleep patterns
+UN004,MG31.1,related-to,0.66,Choleric heat can contribute to metabolic disorders

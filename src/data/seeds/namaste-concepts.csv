@@ -1,0 +1,13 @@
+code,display,definition,system,properties
+AY001,Vata Dosha Imbalance,Imbalance in Vata dosha causing various symptoms,ayurveda,"{""dosha"":""vata"",""severity"":""moderate""}"
+AY002,Pitta Dosha Excess,Excessive Pitta dosha manifestation,ayurveda,"{""dosha"":""pitta"",""severity"":""high""}"
+AY003,Kapha Stagnation,Stagnant Kapha dosha condition,ayurveda,"{""dosha"":""kapha"",""severity"":""mild""}"
+AY004,Agni Mandya,Digestive fire weakness,ayurveda,"{""dosha"":""all"",""digestive"":""weak""}"
+AY005,Ama Accumulation,Toxic accumulation in body,ayurveda,"{""toxins"":""high"",""cleansing"":""needed""}"
+SI001,Vatha Kalam Disorder,Siddha medicine Vatha humor imbalance,siddha,"{""humor"":""vatha"",""manifestation"":""chronic""}"
+SI002,Pitham Excess Syndrome,Excessive Pitham humor in Siddha system,siddha,"{""humor"":""pitham"",""manifestation"":""acute""}"
+SI003,Kabam Stagnation,Kabam humor stagnation condition,siddha,"{""humor"":""kabam"",""flow"":""blocked""}"
+UN001,Sanguine Temperament Disorder,Hot and moist temperament imbalance,unani,"{""temperament"":""sanguine"",""quality"":""hot_moist""}"
+UN002,Melancholic Constitution Issue,Cold and dry temperament problem,unani,"{""temperament"":""melancholic"",""quality"":""cold_dry""}"
+UN003,Phlegmatic Imbalance,Cold and moist temperament excess,unani,"{""temperament"":""phlegmatic"",""quality"":""cold_moist""}"
+UN004,Choleric Heat Syndrome,Hot and dry temperament dominance,unani,"{""temperament"":""choleric"",""quality"":""hot_dry""}"

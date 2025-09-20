@@ -13,10 +13,10 @@ async function startServer() {
 
     // Sync database models (create tables if they don't exist)
     if (process.env.NODE_ENV !== 'production') {
-      await sequelize.sync({ alter: true });
-      logger.info('Database models synchronized');
-    }
-
+  // For SQLite, use force: true on first run, then switch to false
+  await sequelize.sync({ force: false });
+  logger.info('Database models synchronized');
+}
     // Start the server
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
