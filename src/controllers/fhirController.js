@@ -1,12 +1,22 @@
 import fhirService from '../services/fhirService.js';
 import bundleService from '../services/bundleService.js';
+import aiService from '../services/aiService.js';
 import logger from '../utils/logger.js';
 
 class FhirController {
-  // Get FHIR metadata/capability statement
+  // Get FHIR metadata/capability statement (AI-enhanced)
   async getMetadata(req, res, next) {
     try {
-      const capabilityStatement = fhirService.generateCapabilityStatement();
+      // Try to get AI-enhanced capability statement first
+      let capabilityStatement;
+      try {
+        capabilityStatement = await aiService.generateCapabilityStatement();
+        logger.info('Using AI-generated capability statement');
+      } catch (aiError) {
+        logger.warn('AI capability statement failed, using fallback:', aiError.message);
+        capabilityStatement = fhirService.generateCapabilityStatement();
+      }
+      
       res.json(capabilityStatement);
     } catch (error) {
       logger.error('Metadata error:', error);
@@ -14,7 +24,7 @@ class FhirController {
     }
   }
 
-  // Get NAMASTE CodeSystem
+  // Get NAMASTE CodeSystem (AI-enhanced)
   async getCodeSystem(req, res, next) {
     try {
       const { system } = req.params;
@@ -32,9 +42,17 @@ class FhirController {
         });
       }
 
-      const codeSystem = await fhirService.generateCodeSystem(system);
-      const validatedResource = fhirService.addMetadata(codeSystem);
+      // Try AI-generated CodeSystem first
+      let codeSystem;
+      try {
+        codeSystem = await aiService.generateCodeSystem(system);
+        logger.info(`Using AI-generated CodeSystem for ${system}`);
+      } catch (aiError) {
+        logger.warn(`AI CodeSystem generation failed for ${system}, using fallback:`, aiError.message);
+        codeSystem = await fhirService.generateCodeSystem(system);
+      }
 
+      const validatedResource = fhirService.addMetadata(codeSystem);
       res.json(validatedResource);
 
     } catch (error) {

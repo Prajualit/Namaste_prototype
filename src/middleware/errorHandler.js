@@ -39,7 +39,7 @@ const errorHandler = (err, req, res, next) => {
   // FHIR OperationOutcome response
   res.status(statusCode).json({
     resourceType: 'OperationOutcome',
-    id: require('uuid').v4(),
+    id: uuidv4(),
     meta: {
       lastUpdated: new Date().toISOString()
     },

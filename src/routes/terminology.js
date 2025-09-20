@@ -24,4 +24,25 @@ router.get('/systems',
   terminologyController.getSystems
 );
 
+// AI-powered concept mapping
+// POST /terminology/map
+// Body: { "concept": "Pitta dosha imbalance", "sourceSystem": "ayurveda", "targetSystem": "icd11" }
+router.post('/map', 
+  terminologyController.mapConcepts
+);
+
+// AI-powered concept translation
+// POST /terminology/translate
+// Body: { "concept": "Vata dosha", "sourceLanguage": "en", "targetLanguage": "hi", "system": "ayurveda" }
+router.post('/translate', 
+  terminologyController.translateConcept
+);
+
+// AI-powered symptom analysis
+// POST /terminology/analyze-symptoms
+// Body: { "symptoms": ["headache", "fever", "nausea"], "language": "en", "system": "ayurveda" }
+router.post('/analyze-symptoms', 
+  terminologyController.analyzeSymptoms
+);
+
 export default router;
