@@ -1,3 +1,7 @@
+import app from './src/app.js';
+import { sequelize } from './src/models/index.js';
+import logger from './src/utils/logger.js';
+
 const PORT = process.env.PORT || 3000;
 
 console.log('🚀 Starting ABHA Authentication Server...');
@@ -7,15 +11,6 @@ console.log(`📍 Port: ${PORT}`);
 // Database connection and server startup
 async function startServer() {
   try {
-    console.log('📦 Loading modules...');
-    
-    // Dynamic imports to avoid static import issues
-    const { default: app } = await import('./app.js');
-    const { sequelize } = await import('./models/index.js');
-    const { default: logger } = await import('./utils/logger.js');
-    
-    console.log('✅ Modules loaded successfully');
-    
     console.log('📡 Testing database connection...');
     // Test database connection
     await sequelize.authenticate();
@@ -49,10 +44,8 @@ async function startServer() {
     // Graceful shutdown
     process.on('SIGTERM', () => {
       logger.info('SIGTERM received, shutting down gracefully');
-      console.log('SIGTERM received, shutting down gracefully');
       server.close(() => {
         logger.info('Server closed');
-        console.log('Server closed');
         sequelize.close();
         process.exit(0);
       });
@@ -60,18 +53,16 @@ async function startServer() {
 
     process.on('SIGINT', () => {
       logger.info('SIGINT received, shutting down gracefully');
-      console.log('SIGINT received, shutting down gracefully');
       server.close(() => {
         logger.info('Server closed');
-        console.log('Server closed');
         sequelize.close();
         process.exit(0);
       });
     });
 
   } catch (error) {
+    logger.error('Failed to start server:', error);
     console.error('❌ Server startup failed:', error);
-    console.error('Stack:', error.stack);
     process.exit(1);
   }
 }

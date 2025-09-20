@@ -1,6 +1,6 @@
-const express = require('express');
-const translationController = require('../controllers/translationController');
-const { translationValidation, validateRequest } = require('../middleware/validation');
+import express from 'express';
+import translationController from '../controllers/translationController.js';
+import { translationValidation, validateRequest } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -24,4 +24,4 @@ router.post('/$batch-translate',
   translationController.batchTranslate
 );
 
-module.exports = router;
+export default router;

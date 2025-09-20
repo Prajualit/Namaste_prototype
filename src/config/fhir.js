@@ -1,4 +1,4 @@
-const constants = require('./constants');
+import constants from './constants.js';
 
 const FHIR_CONFIG = {
   version: 'R4',
@@ -23,4 +23,4 @@ const FHIR_CONFIG = {
   }]
 };
 
-module.exports = FHIR_CONFIG;
+export default FHIR_CONFIG;

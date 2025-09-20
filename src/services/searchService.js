@@ -1,6 +1,9 @@
-const { Op, Sequelize } = require('sequelize');
+import { Op, Sequelize } from 'sequelize';
+// Using createRequire to import CommonJS models temporarily
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const { NamasteConcept, ICD11Concept } = require('../models');
-const logger = require('../utils/logger');
+import logger from '../utils/logger.js';
 
 class SearchService {
   // Full-text search across all systems
@@ -138,4 +141,4 @@ class SearchService {
   }
 }
 
-module.exports = new SearchService();
+export default new SearchService();

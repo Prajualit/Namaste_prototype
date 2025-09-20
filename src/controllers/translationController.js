@@ -1,6 +1,6 @@
-const mappingService = require('../services/mappingService');
-const { translationValidation, validateRequest } = require('../middleware/validation');
-const logger = require('../utils/logger');
+import mappingService from '../services/mappingService.js';
+import { translationValidation, validateRequest } from '../middleware/validation.js';
+import logger from '../utils/logger.js';
 
 class TranslationController {
   // Translate concept between systems
@@ -248,4 +248,4 @@ class TranslationController {
   }
 }
 
-module.exports = new TranslationController();
+export default new TranslationController();

@@ -1,6 +1,9 @@
+// Using createRequire to import CommonJS models temporarily
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const { ConceptMapping, NamasteConcept, ICD11Concept } = require('../models');
-const logger = require('../utils/logger');
-const constants = require('../config/constants');
+import logger from '../utils/logger.js';
+import constants from '../config/constants.js';
 
 class MappingService {
   // Get mappings for a NAMASTE concept
@@ -116,4 +119,4 @@ class MappingService {
   }
 }
 
-module.exports = new MappingService();
+export default new MappingService();

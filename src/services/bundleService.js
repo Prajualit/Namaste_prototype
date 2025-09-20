@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
-const { buildConditionResource } = require('../utils/fhirUtils');
-const mappingService = require('./mappingService');
-const searchService = require('./searchService');
-const logger = require('../utils/logger');
+import { v4 as uuidv4 } from 'uuid';
+import { buildConditionResource } from '../utils/fhirUtils.js';
+import mappingService from './mappingService.js';
+import searchService from './searchService.js';
+import logger from '../utils/logger.js';
 
 class BundleService {
   // Create FHIR Bundle with dual-coded conditions
@@ -174,4 +174,4 @@ class BundleService {
   }
 }
 
-module.exports = new BundleService();
+export default new BundleService();

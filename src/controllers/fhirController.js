@@ -1,6 +1,6 @@
-const fhirService = require('../services/fhirService');
-const bundleService = require('../services/bundleService');
-const logger = require('../utils/logger');
+import fhirService from '../services/fhirService.js';
+import bundleService from '../services/bundleService.js';
+import logger from '../utils/logger.js';
 
 class FhirController {
   // Get FHIR metadata/capability statement
@@ -135,4 +135,4 @@ class FhirController {
   }
 }
 
-module.exports = new FhirController();
+export default new FhirController();

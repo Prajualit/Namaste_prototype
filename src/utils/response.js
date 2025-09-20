@@ -1,7 +1,7 @@
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
 // Standardized response formatting
-const createResponse = (data, statusCode = 200) => {
+export const createResponse = (data, statusCode = 200) => {
   return {
     statusCode,
     data,
@@ -9,8 +9,28 @@ const createResponse = (data, statusCode = 200) => {
   };
 };
 
+// Success response helper
+export const successResponse = (res, message, data = null, statusCode = 200) => {
+  return res.status(statusCode).json({
+    success: true,
+    message,
+    data,
+    timestamp: new Date().toISOString()
+  });
+};
+
+// Error response helper
+export const errorResponse = (res, message, statusCode = 500, details = null) => {
+  return res.status(statusCode).json({
+    success: false,
+    message,
+    error: details,
+    timestamp: new Date().toISOString()
+  });
+};
+
 // FHIR Bundle response helper
-const createBundle = (type, entries, total = null) => {
+export const createBundle = (type, entries, total = null) => {
   return {
     resourceType: 'Bundle',
     id: uuidv4(),
@@ -27,7 +47,7 @@ const createBundle = (type, entries, total = null) => {
 };
 
 // Search result formatting
-const formatSearchResults = (results, system = null) => {
+export const formatSearchResults = (results, system = null) => {
   return results.map(result => ({
     system: system || result.systemUri,
     code: result.code,
@@ -38,7 +58,7 @@ const formatSearchResults = (results, system = null) => {
 };
 
 // FHIR OperationOutcome for successful operations
-const createOperationOutcome = (severity = 'information', code = 'informational', message) => {
+export const createOperationOutcome = (severity = 'information', code = 'informational', message) => {
   return {
     resourceType: 'OperationOutcome',
     id: uuidv4(),
@@ -55,8 +75,10 @@ const createOperationOutcome = (severity = 'information', code = 'informational'
   };
 };
 
-module.exports = {
+export default {
   createResponse,
+  successResponse,
+  errorResponse,
   createBundle,
   formatSearchResults,
   createOperationOutcome

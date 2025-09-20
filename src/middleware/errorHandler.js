@@ -1,4 +1,5 @@
-const logger = require('../utils/logger');
+import logger from '../utils/logger.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // FHIR-compliant error handler
 const errorHandler = (err, req, res, next) => {
@@ -50,7 +51,7 @@ const errorHandler = (err, req, res, next) => {
 const notFoundHandler = (req, res) => {
   res.status(404).json({
     resourceType: 'OperationOutcome',
-    id: require('uuid').v4(),
+    id: uuidv4(),
     meta: {
       lastUpdated: new Date().toISOString()
     },
@@ -64,4 +65,4 @@ const notFoundHandler = (req, res) => {
   });
 };
 
-module.exports = { errorHandler, notFoundHandler };
+export { errorHandler, notFoundHandler };
