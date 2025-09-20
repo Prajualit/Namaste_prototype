@@ -10,6 +10,7 @@ router.get('/metadata', fhirController.getMetadata);
 
 // CodeSystem endpoints
 router.get('/CodeSystem/namaste-:system', fhirController.getCodeSystem);
+router.get('/CodeSystem/:system', fhirController.getCodeSystem); // Add direct system access
 
 // ConceptMap endpoints
 router.get('/ConceptMap/namaste-icd11', fhirController.getConceptMap);
