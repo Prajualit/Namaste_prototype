@@ -25,7 +25,7 @@ const validateRequest = (req, res, next) => {
 const searchValidation = [
   query('q').optional().isLength({ min: 2, max: 100 })
     .withMessage('Query must be between 2 and 100 characters'),
-  query('system').optional().isIn(['ayurveda', 'siddha', 'unani', 'icd11'])
+  query('system').optional().isIn(['all', 'ayurveda', 'siddha', 'unani', 'icd11'])
     .withMessage('Invalid system'),
   query('_limit').optional().isInt({ min: 1, max: 100 })
     .withMessage('Limit must be between 1 and 100'),

@@ -117,6 +117,58 @@ function showDemoResults(query) {
     });
 }
 
+// Display search results from API
+function displaySearchResults(data) {
+    searchResults.innerHTML = '';
+    
+    // Handle FHIR Parameters response structure
+    let concepts = [];
+    
+    if (data.resourceType === 'Parameters' && data.parameter) {
+        const resultParam = data.parameter.find(p => p.name === 'result');
+        if (resultParam && resultParam.part) {
+            const conceptsParam = resultParam.part.find(p => p.name === 'concepts');
+            if (conceptsParam && conceptsParam.resource && conceptsParam.resource.entry) {
+                concepts = conceptsParam.resource.entry.map(entry => {
+                    const coding = entry.resource.code.coding[0];
+                    return {
+                        code: coding.code,
+                        display: coding.display,
+                        system: coding.system,
+                        definition: entry.resource.text ? entry.resource.text.div : coding.display
+                    };
+                });
+            }
+        }
+    }
+    
+    if (concepts.length === 0) {
+        searchResults.innerHTML = '<p style="padding: 20px; text-align: center; color: #666;">No results found. Try different search terms.</p>';
+        return;
+    }
+    
+    concepts.forEach(concept => {
+        const conceptCard = document.createElement('div');
+        conceptCard.className = 'concept-card';
+        conceptCard.innerHTML = `
+            <div class="concept-header">
+                <span class="concept-code">${concept.code}</span>
+                <span class="concept-system">${getSystemName(concept.system)}</span>
+            </div>
+            <div class="concept-display">${concept.display}</div>
+            <div class="concept-definition">${concept.definition}</div>
+        `;
+        
+        conceptCard.addEventListener('click', () => selectConcept({
+            code: concept.code,
+            display: concept.display,
+            system: concept.system
+        }));
+        
+        searchResults.appendChild(conceptCard);
+    });
+}
+
 // Rest of your functions remain the same...
 function selectConcept(coding) {
     const existing = selectedConcepts.find(c => c.code === coding.code && c.system === coding.system);
