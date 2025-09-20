@@ -34,19 +34,21 @@ const mockAuth = (req, res, next) => {
   }
 
   try {
-    // For demo, accept any valid JWT structure
+    // For demo mode, accept specific demo tokens
     if (process.env.DEMO_MODE === 'true') {
-      // Mock user context for demo
-      req.user = {
-        id: 'demo-user-' + uuidv4(),
-        abhaId: 'demo-abha-12345',
-        practitioner: {
-          id: 'practitioner-demo',
-          specialty: 'Traditional Medicine',
-          system: 'ayurveda'
-        }
-      };
-      return next();
+      // Accept demo tokens without JWT validation
+      if (token === 'demo-token-12345' || token.startsWith('demo-')) {
+        req.user = {
+          id: 'demo-user-' + uuidv4(),
+          abhaId: 'demo-abha-12345',
+          practitioner: {
+            id: 'practitioner-demo',
+            specialty: 'Traditional Medicine',
+            system: 'ayurveda'
+          }
+        };
+        return next();
+      }
     }
 
     // In production, validate against actual ABHA tokens

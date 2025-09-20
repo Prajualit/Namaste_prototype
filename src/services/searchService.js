@@ -26,43 +26,27 @@ class SearchService {
         }
       }
 
-      // PostgreSQL full-text search using TSVECTOR
+      // SQLite-compatible search using LIKE and basic text matching
       const namasteResults = await NamasteConcept.findAll({
         where: {
           ...searchConditions,
           [Op.or]: [
-            Sequelize.where(
-              Sequelize.fn('to_tsvector', 'english', 
-                Sequelize.fn('concat_ws', ' ', 
-                  Sequelize.col('display'), 
-                  Sequelize.col('definition')
-                )
-              ),
-              '@@',
-              Sequelize.fn('to_tsquery', 'english', this.formatSearchQuery(query))
-            ),
-            { display: { [Op.iLike]: `%${query}%` } },
-            { code: { [Op.iLike]: `%${query}%` } }
+            { display: { [Op.like]: `%${query}%` } },
+            { code: { [Op.like]: `%${query}%` } },
+            { definition: { [Op.like]: `%${query}%` } }
           ]
         },
         attributes: [
-          'id', 'code', 'display', 'definition', 'system', 'systemUri', 'properties',
-          // Calculate relevance score
-          [
-            Sequelize.fn('ts_rank',
-              Sequelize.fn('to_tsvector', 'english',
-                Sequelize.fn('concat_ws', ' ',
-                  Sequelize.col('display'),
-                  Sequelize.col('definition')
-                )
-              ),
-              Sequelize.fn('to_tsquery', 'english', this.formatSearchQuery(query))
-            ),
-            'rank'
-          ]
+          'id', 'code', 'display', 'definition', 'system', 'systemUri', 'properties'
         ],
         order: [
-          [Sequelize.literal('rank'), 'DESC'],
+          // Simple ordering by relevance (exact matches first, then partial matches)
+          [Sequelize.literal(`CASE 
+            WHEN display LIKE '${query}%' THEN 1
+            WHEN display LIKE '%${query}%' THEN 2
+            WHEN code LIKE '${query}%' THEN 3
+            ELSE 4
+          END`), 'ASC'],
           ['display', 'ASC']
         ],
         limit,
@@ -90,37 +74,22 @@ class SearchService {
         where: {
           status: 'active',
           [Op.or]: [
-            Sequelize.where(
-              Sequelize.fn('to_tsvector', 'english',
-                Sequelize.fn('concat_ws', ' ',
-                  Sequelize.col('display'),
-                  Sequelize.col('definition')
-                )
-              ),
-              '@@',
-              Sequelize.fn('to_tsquery', 'english', this.formatSearchQuery(query))
-            ),
-            { display: { [Op.iLike]: `%${query}%` } },
-            { code: { [Op.iLike]: `%${query}%` } }
+            { display: { [Op.like]: `%${query}%` } },
+            { code: { [Op.like]: `%${query}%` } },
+            { definition: { [Op.like]: `%${query}%` } }
           ]
         },
         attributes: [
-          'id', 'code', 'display', 'definition', 'systemUri', 'category',
-          [
-            Sequelize.fn('ts_rank',
-              Sequelize.fn('to_tsvector', 'english',
-                Sequelize.fn('concat_ws', ' ',
-                  Sequelize.col('display'),
-                  Sequelize.col('definition')
-                )
-              ),
-              Sequelize.fn('to_tsquery', 'english', this.formatSearchQuery(query))
-            ),
-            'rank'
-          ]
+          'id', 'code', 'display', 'definition', 'systemUri', 'category'
         ],
         order: [
-          [Sequelize.literal('rank'), 'DESC'],
+          // Simple ordering by relevance (exact matches first, then partial matches)
+          [Sequelize.literal(`CASE 
+            WHEN display LIKE '${query}%' THEN 1
+            WHEN display LIKE '%${query}%' THEN 2
+            WHEN code LIKE '${query}%' THEN 3
+            ELSE 4
+          END`), 'ASC'],
           ['display', 'ASC']
         ],
         limit,
