@@ -6,17 +6,35 @@ import logger from "../utils/logger.js";
  */
 class AiService {
   constructor() {
+    // Lazy-load configuration to avoid env loading timing issues
+    this._initialized = false;
+    this.apiKey = null;
+    this.apiUrl = null;
+    this.model = null;
+  }
+
+  /**
+   * Initialize configuration (lazy-loaded)
+   * @private
+   */
+  _initializeConfig() {
+    if (this._initialized) return;
+    
     this.apiKey = process.env.GEMINI_API_KEY || "";
     this.apiUrl =
       process.env.GEMINI_API_URL ||
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
-    this.model = process.env.GEMINI_MODEL || "gemini-pro";
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    this.model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
     if (!this.apiKey) {
       logger.warn(
         "GEMINI_API_KEY not configured - AI mapping will use fallback responses"
       );
+    } else {
+      logger.info(`AI Service initialized with Gemini API (${this.model})`);
     }
+    
+    this._initialized = true;
   }
 
   /**
@@ -27,6 +45,8 @@ class AiService {
    * @returns {Promise<Object>} Mapping result with confidence score
    */
   async mapTraditionalToICD11(concept, system = "ayurveda", options = {}) {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = this.buildMappingPrompt(concept, system, options);
       const response = await this.callGeminiAPI(prompt);
@@ -56,6 +76,8 @@ class AiService {
     targetLanguage,
     system = "ayurveda"
   ) {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = `Translate the ${system} medicine concept "${concept}" from ${sourceLanguage} to ${targetLanguage}. 
       Consider cultural and medical context. Provide translation confidence score (0-1) and cultural context notes.
@@ -98,6 +120,8 @@ class AiService {
    * @returns {Promise<Object>} Analysis result
    */
   async analyzeSymptoms(symptoms, language = "en", system = "ayurveda") {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = `Analyze these symptoms from a ${system} medicine perspective: ${symptoms.join(
         ", "
@@ -162,6 +186,8 @@ class AiService {
    * @returns {Promise<Array>} Array of similar concepts
    */
   async searchSimilarConcepts(query, system = "ayurveda", limit = 10) {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = `Find ${limit} ${system} medicine concepts similar to "${query}".
       Return array of concepts with codes and definitions.
@@ -271,6 +297,8 @@ class AiService {
    * @returns {Promise<Array>} Array of mapping suggestions
    */
   async mapConceptToICD11(concept, system = "ayurveda", options = {}) {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = this.buildMappingPrompt(concept, system, options);
       const response = await this.callGeminiAPI(prompt);
@@ -289,6 +317,8 @@ class AiService {
    * @returns {Promise<Object>} FHIR CodeSystem resource
    */
   async generateCodeSystem(system, concepts = []) {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = this.buildCodeSystemPrompt(system, concepts);
       const response = await this.callGeminiAPI(prompt);
@@ -312,6 +342,8 @@ class AiService {
     targetSystem = "icd11",
     concepts = []
   ) {
+    this._initializeConfig(); // Lazy-load configuration
+    
     try {
       const prompt = this.buildConceptMappingsPrompt(
         sourceSystem,
@@ -332,6 +364,8 @@ class AiService {
    * @private
    */
   async callGeminiAPI(prompt) {
+    this._initializeConfig(); // Ensure configuration is loaded
+    
     if (!this.apiKey) {
       throw new Error("Gemini API key not configured");
     }

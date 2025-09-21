@@ -80,6 +80,12 @@ function showDashboard() {
             </div>
         `;
     }
+    
+    // Initialize AI features when dashboard becomes visible
+    if (typeof window.initializeAIFeatures === 'function') {
+        console.log('🚀 Dashboard shown, initializing AI features...');
+        setTimeout(() => window.initializeAIFeatures(), 100);
+    }
 }
 
 async function handleLogin(event) {
@@ -377,7 +383,7 @@ function updateSelectedConcepts() {
     
     selectedConceptsContainer.innerHTML = selectedConcepts.map((concept, index) => `
         <div class="selected-concept" style="background: #e6fffa; border: 1px solid #38b2ac; border-radius: 6px; padding: 15px; margin-bottom: 15px; position: relative;">
-            <button class="remove-concept" onclick="removeConcept(${index})" style="position: absolute; top: 10px; right: 10px; background: #e53e3e; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+            <button class="remove-concept" data-index="${index}" style="position: absolute; top: 10px; right: 10px; background: #e53e3e; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; z-index: 10;">×</button>
             <div class="concept-header" style="margin-bottom: 8px;">
                 <span class="concept-code" style="background: #667eea; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 8px;">${concept.code}</span>
                 <span class="concept-system" style="background: #48bb78; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${getSystemName(concept.system)}</span>
@@ -388,6 +394,17 @@ function updateSelectedConcepts() {
             </div>
         </div>
     `).join('');
+    
+    // Add event listeners for remove buttons using event delegation
+    const removeButtons = selectedConceptsContainer.querySelectorAll('.remove-concept');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const index = parseInt(this.getAttribute('data-index'));
+            removeConcept(index);
+        });
+    });
 }
 
 function removeConcept(index) {
@@ -448,11 +465,34 @@ async function generateBundle() {
 
 // Utility functions
 function getSystemName(systemUri) {
-    if (systemUri.includes('ayurveda')) return 'Ayurveda';
-    if (systemUri.includes('siddha')) return 'Siddha'; 
-    if (systemUri.includes('unani')) return 'Unani';
-    if (systemUri.includes('icd')) return 'ICD-11';
-    return 'Unknown';
+    if (!systemUri) return 'General';
+    
+    // Match exact patterns from demo data
+    if (systemUri === 'http://terminology.gov.in/namaste/ayurveda') return 'Ayurveda';
+    if (systemUri === 'http://terminology.gov.in/namaste/siddha') return 'Siddha';
+    if (systemUri === 'http://terminology.gov.in/namaste/unani') return 'Unani';
+    
+    // Convert to lowercase for pattern matching
+    const uri = systemUri.toLowerCase();
+    
+    // Check for specific system patterns
+    if (uri.includes('/ayurveda')) return 'Ayurveda';
+    if (uri.includes('/siddha')) return 'Siddha'; 
+    if (uri.includes('/unani')) return 'Unani';
+    if (uri.includes('icd') || uri.includes('/11/')) return 'ICD-11';
+    if (uri.includes('snomed')) return 'SNOMED';
+    if (uri.includes('loinc')) return 'LOINC';
+    if (uri.includes('hl7.org')) return 'HL7';
+    
+    // Extract the last part of the URI for unknown systems
+    const parts = systemUri.split('/');
+    const lastPart = parts[parts.length - 1];
+    if (lastPart && lastPart.length > 0) {
+        // Capitalize first letter and replace hyphens/underscores with spaces
+        return lastPart.charAt(0).toUpperCase() + lastPart.slice(1).replace(/[-_]/g, ' ');
+    }
+    
+    return 'Medical System';
 }
 
 function showError(message) {
